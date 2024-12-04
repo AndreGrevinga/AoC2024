@@ -1001,15 +1001,24 @@ fn main() {
 39667   36867";
 
     let parts: Vec<&str> = input.split_whitespace().collect();
-    let mut result: Vec<i32> = Vec::new();
+    let mut leftVec: Vec<i32> = Vec::new();
+    let mut rightVec: Vec<i32> = Vec::new();
+    let mut results: Vec<i32> = Vec::new();
     for (i, string) in parts.iter().enumerate() {
+        let number: i32 = string.parse().unwrap();
         if i % 2 == 0 {
-            let number: i32 = string.parse().unwrap();
-            let second_number: i32 = parts[i + 1].parse().unwrap();
-            let diff: i32 = number - second_number;
-            result.push(diff.abs());
+            leftVec.push(number);
         }
+        else {
+            rightVec.push(number);
+        }
+    leftVec.sort();
+    rightVec.sort();
     }
-    let sum: i32 = result.iter().sum();
+    for (i, number) in leftVec.iter().enumerate() {
+        let diff: i32 = number - rightVec[i];
+        results.push(diff.abs());
+    }
+    let sum: i32 = results.iter().sum();
     println!("{}" , sum.to_string());
 }
