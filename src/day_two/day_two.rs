@@ -42,17 +42,10 @@ pub fn day_two_part_two() {
     let input1 = fs::read_to_string("./src/day_two/input.txt")
         .expect("Should have been able to read the file");
 
-    let input2 = "7 6 4 2 1
-1 2 7 8 9
-9 7 6 2 1
-1 3 2 4 5
-8 6 4 4 1
-1 3 6 7 9";
-
-    let input3 = "1 2 7 8 9";
+    let input2 = "1 9 8 7 6";
 
     let mut counter: i32 = 0;
-    for line in input3.lines() {
+    for line in input1.lines() {
         let numbers: Vec<&str> = line.split_whitespace().collect();
         let mut is_safe: bool = true;
         let mut previous_number: i32 = 0;
@@ -63,18 +56,26 @@ pub fn day_two_part_two() {
         for (i, string) in numbers.iter().enumerate() {
             if is_safe || fail_safe_triggered {
                 let number: i32 = string.parse().unwrap();
-                if i == 1 || (i == 2 && fail_safe_triggered) {
-                    is_ascending = number > previous_number;
-                }
                 if !(i == 0) {
-                    is_safe = check_numbers(number, previous_number, is_ascending);
-                    if !is_safe && fail_safe_triggered {
-                        if i == 2 {
-                            is_ascending = number > previous_previous_number;
-                        }
-                        is_safe = check_numbers(number, previous_previous_number, is_ascending);
+                    if i == 1 {
+                        is_ascending = number > previous_number;
                     }
-                    if !is_safe && i == numbers.len() && fail_safe {
+                    if fail_safe_triggered {
+                        if i == 2 {
+                            is_ascending = number > previous_number;
+                            is_safe = check_numbers(number, previous_number, is_ascending);
+                            if !is_safe {
+                                is_ascending = number > previous_previous_number;
+                                is_safe =
+                                    check_numbers(number, previous_previous_number, is_ascending);
+                            }
+                        } else {
+                            is_safe = check_numbers(number, previous_previous_number, is_ascending);
+                        }
+                    } else {
+                        is_safe = check_numbers(number, previous_number, is_ascending);
+                    }
+                    if !is_safe && i + 1 == numbers.len() && fail_safe {
                         is_safe = true;
                     }
                     fail_safe_triggered = false;
