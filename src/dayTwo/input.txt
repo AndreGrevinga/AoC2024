@@ -1,5 +1,4 @@
-fn main() {
-    let input = "48 51 52 53 52
+48 51 52 53 52
 86 87 88 91 91
 22 25 28 31 32 36
 65 66 68 69 71 72 75 82
@@ -999,38 +998,3 @@ fn main() {
 94 92 89 86 83 80
 46 49 50 52 55 56 57
 78 75 74 73 71 70 68
-";
-
-    let mut counter: i32 = 0;
-    for line in input.lines() {
-        let numbers: Vec<&str> = line.split_whitespace().collect();
-        let mut is_safe: bool = true;
-        let mut previous_number: i32 = 0;
-        let mut is_ascending: bool = true;
-        for (i, string) in numbers.iter().enumerate() {
-            let number: i32 = string.parse().unwrap();
-            if !(previous_number == 0) {
-                if previous_number == number || (previous_number - number).abs() > 3 {
-                    is_safe = false;
-                } else if number > previous_number {
-                    if i == 1 || is_ascending {
-                        is_ascending = true;
-                    } else {
-                        is_safe = false;
-                    }
-                } else {
-                    if i == 1 || !is_ascending {
-                        is_ascending = false;
-                    } else {
-                        is_safe = false;
-                    }
-                }
-            }
-            previous_number = number;
-        }
-        if is_safe {
-            counter += 1;
-        }
-    }
-    println!("{}", counter);
-}
