@@ -22,7 +22,6 @@ pub fn day_four_part_one() {
     for (y, vec) in get_cached_vec().iter().enumerate() {
         for (x, char) in vec.iter().enumerate() {
             if *char == 'X' {
-                println!("{} | {}", y, x);
                 result += find_mas(x as i32, y as i32);
             }
         }
