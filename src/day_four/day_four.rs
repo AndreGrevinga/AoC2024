@@ -19,6 +19,23 @@ fn get_cached_vec() -> Vec<Vec<char>> {
 
 pub fn day_four_part_one() {
     let mut result: i32 = 0;
+    fn find_mas(start_x: i32, start_y: i32) -> i32 {
+        let x_array: [i32; 3] = [-1, 0, 1];
+        let y_array: [i32; 3] = [-1, 0, 1];
+        let mut counter: i32 = 0;
+        for y in y_array {
+            for x in x_array {
+                if !(x == 0 && y == 0) {
+                    let new_x = start_x + x;
+                    let new_y = start_y + y;
+                    if find_char('M', new_x, new_y, x, y) {
+                        counter += 1;
+                    }
+                }
+            }
+        }
+        counter
+    }
     for (y, vec) in get_cached_vec().iter().enumerate() {
         for (x, char) in vec.iter().enumerate() {
             if *char == 'X' {
@@ -29,26 +46,10 @@ pub fn day_four_part_one() {
     println!("{}", result)
 }
 
-fn find_mas(start_x: i32, start_y: i32) -> i32 {
-    let x_array: [i32; 3] = [-1, 0, 1];
-    let y_array: [i32; 3] = [-1, 0, 1];
-    let mut counter: i32 = 0;
-    for y in y_array {
-        for x in x_array {
-            if !(x == 0 && y == 0) {
-                let new_x = start_x + x;
-                let new_y = start_y + y;
-                counter += find_char('M', new_x, new_y, x, y);
-            }
-        }
-    }
-    counter
-}
-fn find_char(char: char, start_x: i32, start_y: i32, change_x: i32, change_y: i32) -> i32 {
-    let mut inner_counter: i32 = 0;
+fn find_char(char: char, start_x: i32, start_y: i32, change_x: i32, change_y: i32) -> bool {
     if has_char(char, start_x, start_y) {
         if char == 'S' {
-            inner_counter += 1;
+            true
         } else {
             let next_char: char = match char {
                 'M' => 'A',
@@ -57,10 +58,11 @@ fn find_char(char: char, start_x: i32, start_y: i32, change_x: i32, change_y: i3
             };
             let new_x = start_x + change_x;
             let new_y = start_y + change_y;
-            inner_counter = find_char(next_char, new_x, new_y, change_x, change_y);
+            find_char(next_char, new_x, new_y, change_x, change_y)
         }
+    } else {
+        false
     }
-    inner_counter
 }
 fn has_char(char: char, x: i32, y: i32) -> bool {
     if y >= 0 || x >= 0 {
@@ -85,6 +87,19 @@ fn has_char(char: char, x: i32, y: i32) -> bool {
 }
 
 pub fn day_four_part_two() {
-    let input = fs::read_to_string("./src/day_one/input.txt")
-        .expect("Should have been able to read the file");
+    let mut result: i32 = 0;
+    for (y, vec) in get_cached_vec().iter().enumerate() {
+        for (x, char) in vec.iter().enumerate() {
+            if *char == 'A' {
+                if (find_char('M', x as i32 + 1, y as i32 - 1, -1, 1)
+                    || find_char('M', x as i32 - 1, y as i32 + 1, 1, -1))
+                    && (find_char('M', x as i32 + 1, y as i32 + 1, -1, -1)
+                        || find_char('M', x as i32 - 1, y as i32 - 1, 1, 1))
+                {
+                    result += 1;
+                }
+            }
+        }
+    }
+    println!("{}", result)
 }
