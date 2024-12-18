@@ -1,7 +1,7 @@
-use day_five::day_five::{day_five_part_one, day_five_part_two};
+use day_nine::day_nine::day_nine_part_one;
 
-mod day_five;
+mod day_nine;
 
 fn main() {
-    day_five_part_two();
+    day_nine_part_one();
 }
