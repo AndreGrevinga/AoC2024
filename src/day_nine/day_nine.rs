@@ -57,3 +57,7 @@ pub fn day_nine_part_one() {
     println!("{:?}", third_numbers);
     println!("{}", sum);
 }
+
+pub fn day_nine_part_two() {
+    
+}

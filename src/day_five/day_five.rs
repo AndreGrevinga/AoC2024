@@ -14,8 +14,9 @@ fn load_rules() -> Vec<Vec<i32>> {
     rules
 }
 
-fn check_numbers(rules: &Vec<Vec<i32>>, numbers: &Vec<i32>) -> bool {
+fn check_numbers(rules: &Vec<Vec<i32>>, numbers: &Vec<i32>) -> (bool, Vec<i32>) {
     let mut check_passed = true;
+    let mut failed_rule: Vec<i32> = vec![-1, -1];
     for rule_vec in rules {
         let first_rule_num = rule_vec[0];
         let second_rule_num = rule_vec[1];
@@ -24,11 +25,12 @@ fn check_numbers(rules: &Vec<Vec<i32>>, numbers: &Vec<i32>) -> bool {
             let pos_two: usize = get_position(numbers, second_rule_num);
             if pos_one > pos_two {
                 check_passed = false;
+                failed_rule = rule_vec.clone();
                 break;
             }
         }
     }
-    check_passed
+    (check_passed, failed_rule)
 }
 
 pub fn day_five_part_one() {
@@ -45,7 +47,7 @@ pub fn day_five_part_one() {
             numbers.push(string.parse().unwrap());
         }
 
-        if check_numbers(&rules, &numbers) {
+        if check_numbers(&rules, &numbers).0 {
             sum += numbers[numbers.len() / 2];
         }
     }
@@ -57,10 +59,7 @@ pub fn day_five_part_two() {
         .expect("Should have been able to read the file");
 
     let mut sum: i32 = 0;
-    let mut counter = 0;
     for line in input.lines() {
-        println!("{}", counter);
-        counter += 1;
         let strings: Vec<&str> = line.split(',').collect();
         let mut numbers: Vec<i32> = Vec::new();
 
@@ -68,9 +67,13 @@ pub fn day_five_part_two() {
             numbers.push(string.parse().unwrap());
         }
 
-        if !check_numbers(&rules, &numbers) {
-            while !check_numbers(&rules, &numbers) {
-                //Fix ordering
+        if !check_numbers(&rules, &numbers).0 {
+            let mut result = check_numbers(&rules, &numbers);
+            while !result.0 {
+                let first_index = get_position(&numbers, result.1[0]);
+                let second_index = get_position(&numbers, result.1[1]);
+                numbers.swap(first_index, second_index);
+                result = check_numbers(&rules, &numbers);
             }
             sum += numbers[numbers.len() / 2];
         }
