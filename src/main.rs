@@ -1,4 +1,4 @@
-use day_nine::day_nine::day_nine_part_two;
+use day_nine::day_nine_part_two;
 
 mod day_nine;
 
