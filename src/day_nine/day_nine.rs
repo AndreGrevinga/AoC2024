@@ -33,22 +33,21 @@ fn calculate_checksum(numbers: Vec<i32>) -> i128 {
     sum
 }
 
-fn find_free_space(vec: &Vec<i32>, block_size: i32) -> usize {
-    let mut index: usize = 0;
+fn find_free_space(vec: &Vec<i32>, block_size: i32, max_index: usize) -> i32 {
+    let mut index: i32 = 0;
     let mut free_space: i32 = 0;
-    let len: usize = vec.len();
-    while index < len {
-        if vec[index] == -1 {
+    while index < max_index as i32 {
+        if vec[index as usize] == -1 {
             free_space += 1;
         } else {
             free_space = 0;
         }
         if free_space == block_size {
-            return index - (block_size as usize) + 1;
+            return index - block_size + 1;
         }
         index += 1;
     }
-    0
+    -1
 }
 
 pub fn day_nine_part_one() {
@@ -84,29 +83,27 @@ pub fn day_nine_part_one() {
         second_numbers.remove(num_index);
         previous_number = num;
     }
-    //println!("{:?}", second_numbers);
     println!("{}", calculate_checksum(second_numbers));
 }
 
 pub fn day_nine_part_two() {
-    let input: String =
-        fs::read_to_string("./day_nine/input.txt").expect("Should have been able to read the file");
+    let input: String = fs::read_to_string("./src/day_nine/input.txt")
+        .expect("Should have been able to read the file");
     let numbers = prepare_numbers(&input);
     let mut second_numbers = numbers.clone();
     let numbers_len: usize = numbers.len();
-    let mut previous_number = 0;
+    let mut previous_number = -1;
     let mut block_size = 1;
     for (reverse_index, num) in numbers.into_iter().rev().enumerate() {
         if num == previous_number {
             block_size += 1;
         } else {
-            if num == -1 {
-                let starting_index = find_free_space(&second_numbers, block_size);
-                if starting_index != 0 {
-                    let num_index = numbers_len - reverse_index; //no -1 because we are using the index of the previous number
-
-                    for index in 0..(block_size - 1) {
-                        second_numbers[starting_index + index as usize] = num;
+            if previous_number != -1 {
+                let num_index: usize = numbers_len - reverse_index; //no -1 because we want the index of the previous number
+                let starting_index = find_free_space(&second_numbers, block_size, num_index);
+                if starting_index != -1 {
+                    for index in 0..block_size {
+                        second_numbers[(starting_index + index) as usize] = previous_number;
                         second_numbers[num_index + index as usize] = -1;
                     }
                 }
