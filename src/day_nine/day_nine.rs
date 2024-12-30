@@ -33,15 +33,22 @@ fn calculate_checksum(numbers: Vec<i32>) -> i128 {
     sum
 }
 
-fn number_size(vec: &Vec<i32>, num: i32, start_index: usize) -> i32 {
-    let mut size: i32 = 0;
-    let mut index: usize = start_index;
+fn find_free_space(vec: &Vec<i32>, block_size: i32) -> usize {
+    let mut index: usize = 0;
+    let mut free_space: i32 = 0;
     let len: usize = vec.len();
-    while index < len && vec[index] == num {
-        size += 1;
+    while index < len {
+        if vec[index] == -1 {
+            free_space += 1;
+        } else {
+            free_space = 0;
+        }
+        if free_space == block_size {
+            return index - (block_size as usize) + 1;
+        }
         index += 1;
     }
-    size
+    0
 }
 
 pub fn day_nine_part_one() {
@@ -82,48 +89,31 @@ pub fn day_nine_part_one() {
 }
 
 pub fn day_nine_part_two() {
-    let input: String = fs::read_to_string("./src/day_nine/input.txt")
-        .expect("Should have been able to read the file");
+    let input: String =
+        fs::read_to_string("./day_nine/input.txt").expect("Should have been able to read the file");
     let numbers = prepare_numbers(&input);
     let mut second_numbers = numbers.clone();
     let numbers_len: usize = numbers.len();
+    let mut previous_number = 0;
+    let mut block_size = 1;
     for (reverse_index, num) in numbers.into_iter().rev().enumerate() {
-        if !(num == -1) {
-            while second_numbers.len() > free_space_index
-                && !(second_numbers[free_space_index] == -1)
-            {
-                free_space_index += 1;
+        if num == previous_number {
+            block_size += 1;
+        } else {
+            if num == -1 {
+                let starting_index = find_free_space(&second_numbers, block_size);
+                if starting_index != 0 {
+                    let num_index = numbers_len - reverse_index; //no -1 because we are using the index of the previous number
+                    for index in starting_index..(starting_index + block_size as usize) {
+                        second_numbers[index] = num;
+                        second_numbers[num_index + index] = -1;
+                    }
+                }
             }
-            let num_index = (numbers_len - reverse_index) - 1;
-            second_numbers[free_space_index] = num;
-            second_numbers.remove(num_index);
+            previous_number = num;
+            block_size = 1;
         }
     }
     //println!("{:?}", second_numbers);
     println!("{}", calculate_checksum(second_numbers));
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_number_size() {
-        let vec = vec![1, 1, 1, 2, 2, 3];
-        assert_eq!(number_size(&vec, 1, 0), 3);
-        assert_eq!(number_size(&vec, 2, 3), 2);
-        assert_eq!(number_size(&vec, 3, 5), 1);
-    }
-
-    #[test]
-    fn test_number_size_empty() {
-        let vec: Vec<i32> = vec![];
-        assert_eq!(number_size(&vec, 1, 0), 0);
-    }
-
-    #[test]
-    fn test_number_size_single() {
-        let vec = vec![5];
-        assert_eq!(number_size(&vec, 5, 0), 1);
-    }
 }
