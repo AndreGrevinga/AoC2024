@@ -104,9 +104,10 @@ pub fn day_nine_part_two() {
                 let starting_index = find_free_space(&second_numbers, block_size);
                 if starting_index != 0 {
                     let num_index = numbers_len - reverse_index; //no -1 because we are using the index of the previous number
-                    for index in starting_index..(starting_index + block_size as usize) {
-                        second_numbers[index] = num;
-                        second_numbers[num_index + index] = -1;
+
+                    for index in 0..(block_size - 1) {
+                        second_numbers[starting_index + index as usize] = num;
+                        second_numbers[num_index + index as usize] = -1;
                     }
                 }
             }
