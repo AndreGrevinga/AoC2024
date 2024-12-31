@@ -1,6 +1,6 @@
-use day_seven::part_two;
-mod day_seven;
+use day_twelve::part_one;
+mod day_twelve;
 
 fn main() {
-    part_two();
+    part_one();
 }
